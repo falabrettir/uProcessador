@@ -10,12 +10,12 @@ architecture a_ula_tb of ula_tb is
     -- Componente da uut
     component ula
     port(
-        a: in unsigned (15 down to 0); --entrada a 
-        b: in unsigned (15 down to 0); --entrada b
-        chave: in unsigned (1 down to 0); --chave de selecao
+        a: in unsigned (15 downto 0); --entrada a 
+        b: in unsigned (15 downto 0); --entrada b
+        chave: in unsigned (1 downto 0); --chave de selecao
 
-        u_output: out unsigned (15 down to 0); --output da ula
-        f_zero: out std_logic
+        u_output: out unsigned (15 downto 0); --output da ula
+        f_zero: out std_logic;
         f_carry: out std_logic  --flags de zero e carry
       );
     end component;
