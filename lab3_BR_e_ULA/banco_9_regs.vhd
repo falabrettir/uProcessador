@@ -7,7 +7,7 @@ entity banco_9_regs is
         clk          : in  std_logic;    -- Sinal de clock
         rst          : in  std_logic;    -- Sinal de reset
         wr_en        : in  std_logic; -- Sinal de escrita
-        addr_wr       : in  std_logic_vector(3 downto 0); -- endereço de escrita
+        addr_wr       : in  std_logic_vector(3 downto 0); -- Endereço de escrita
         ra1          : in  std_logic_vector(3 downto 0); -- Endereço do registrador de leitura 1
         ra2          : in  std_logic_vector(3 downto 0); -- Endereço do registrador de leitura 2
         data_wr      : in  unsigned(15 downto 0); -- Dados a serem escritos
