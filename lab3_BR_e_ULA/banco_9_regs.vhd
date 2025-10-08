@@ -7,6 +7,7 @@ entity banco_9_regs is
         clk          : in  std_logic;    -- Sinal de clock
         rst          : in  std_logic;    -- Sinal de reset
         wr_en        : in  std_logic; -- Sinal de escrita
+        addr_wr       : in  std_logic_vector(3 downto 0); -- endereço de escrita
         ra1          : in  std_logic_vector(3 downto 0); -- Endereço do registrador de leitura 1
         ra2          : in  std_logic_vector(3 downto 0); -- Endereço do registrador de leitura 2
         data_wr      : in  unsigned(15 downto 0); -- Dados a serem escritos
@@ -30,15 +31,15 @@ architecture a_banco_9_regs of banco_9_regs is
 
     begin
         -- Decodificação do endereço de escrita
-        wr_en0 <= wr_en when ra1 = "0000" else '0';
-        wr_en1 <= wr_en when ra1 = "0001" else '0';
-        wr_en2 <= wr_en when ra1 = "0010" else '0';
-        wr_en3 <= wr_en when ra1 = "0011" else '0';
-        wr_en4 <= wr_en when ra1 = "0100" else '0';
-        wr_en5 <= wr_en when ra1 = "0101" else '0';
-        wr_en6 <= wr_en when ra1 = "0110" else '0';
-        wr_en7 <= wr_en when ra1 = "0111" else '0';
-        wr_en8 <= wr_en when ra1 = "1000" else '0';
+        wr_en0 <= wr_en when addr_wr = "0000" else '0';
+        wr_en1 <= wr_en when addr_wr = "0001" else '0';
+        wr_en2 <= wr_en when addr_wr = "0010" else '0';
+        wr_en3 <= wr_en when addr_wr = "0011" else '0';
+        wr_en4 <= wr_en when addr_wr = "0100" else '0';
+        wr_en5 <= wr_en when addr_wr = "0101" else '0';
+        wr_en6 <= wr_en when addr_wr = "0110" else '0';
+        wr_en7 <= wr_en when addr_wr = "0111" else '0';
+        wr_en8 <= wr_en when addr_wr = "1000" else '0';
 
         -- Lógica de leitura
         port_map_reg1: reg16bits port map (clk=>clk, rst=>rst, wr_en => wr_en0, data_in => data_wr, data_out => reg1);
