@@ -10,7 +10,7 @@ entity reg16bits is
         data_in       : in  unsigned(15 downto 0);
         data_out      : out unsigned(15 downto 0)
     );
-end entity reg16bits;    end reg16bits;
+end entity reg16bits; 
 
     architecture a_reg16bits of reg16bits is
         signal reg : unsigned(15 downto 0);
