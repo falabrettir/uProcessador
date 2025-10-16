@@ -19,13 +19,13 @@ end entity pc;
                 data_out : out unsigned(16 downto 0)
             );
         end component;
-        signal pc_reg, data_s: unsigned(16 downto 0) := (others => '0');
+        signal pc_reg, pc_out_s, data_s: unsigned(16 downto 0) := (others => '0');
     
     begin
 
-        pc_out <= (others => '0');
-
-        port_map_protouncontrol: protouncontrol port map (data_in => pc_out, data_out => data_s);
+        pc_out_s <= pc_in;
+        
+        port_map_protouncontrol: protouncontrol port map (data_in => pc_out_s, data_out => data_s);
 
         process(clk, rst)
         begin
@@ -33,7 +33,7 @@ end entity pc;
                 pc_reg <= (others => '0');
             elsif wr_en = '1'  then
                 if rising_edge(clk) then
-                    pc_reg <= pc_in;
+                    pc_reg <= data_s;
                 end if;
             end if;
         end process;
