@@ -15,13 +15,18 @@ end entity pc;
     architecture a_pc of pc is
         component protouncontrol
             port(
-                data_in  : in  std_logic_vector(16 downto 0);  
-                data_out : out std_logic_vector(16 downto 0)
+                data_in  : in  unsigned(16 downto 0);  
+                data_out : out unsigned(16 downto 0)
             );
         end component;
         signal pc_reg, data_s: unsigned(16 downto 0) := (others => '0');
     
     begin
+
+        pc_out <= (others => '0');
+
+        port_map_protouncontrol: protouncontrol port map (data_in => pc_out, data_out => data_s);
+
         process(clk, rst)
         begin
             if rst = '1' then
@@ -29,10 +34,8 @@ end entity pc;
             elsif wr_en = '1'  then
                 if rising_edge(clk) then
                     pc_reg <= pc_in;
-                    data_s <= pc_out;
                 end if;
             end if;
         end process;
         pc_out <= pc_reg;
-        data_out <= data_s;
     end a_pc;
