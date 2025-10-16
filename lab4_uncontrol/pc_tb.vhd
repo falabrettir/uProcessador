@@ -11,8 +11,8 @@ architecture a_pc_tb of pc_tb is
             clk      : in  std_logic;
             rst      : in  std_logic;
             wr_en    : in  std_logic;
-            data_in  : in  unsigned(16 downto 0);
-            data_out : out unsigned(16 downto 0)
+            pc_in  : in  unsigned(16 downto 0);
+            pc_out : out unsigned(16 downto 0)
         );
     end component;
 
@@ -20,8 +20,8 @@ architecture a_pc_tb of pc_tb is
     signal clk      : std_logic := '0';
     signal rst      : std_logic := '0';
     signal wr_en    : std_logic := '0';
-    signal data_in  : unsigned(16 downto 0) := (others => '0');
-    signal data_out : unsigned(16 downto 0);
+    signal pc_in    : unsigned(16 downto 0) := (others => '0');
+    signal pc_out   : unsigned(16 downto 0);
 
     -- Período do clock
     constant clk_period : time := 10 ns;
@@ -34,8 +34,8 @@ begin
             clk      => clk,
             rst      => rst,
             wr_en    => wr_en,
-            data_in  => data_in,
-            data_out => data_out
+            pc_in    => pc_in,
+            pc_out   => pc_out
         );
 
     -- Gerador de clock
@@ -63,7 +63,7 @@ begin
     begin
         -- Inicialização
         wr_en <= '0';
-        data_in <= (others => '0');
+        pc_in <= (others => '0');
         
         -- Reset ativo
         rst <= '1';
@@ -75,21 +75,21 @@ begin
         
         -- Testa escrita no PC 
         wr_en <= '1';
-        data_in <= to_unsigned(100, 17); -- Escreve 100 (0x64)
+        pc_in <= to_unsigned(100, 17); -- Escreve 100 (0x64)
         wait for clk_period;
         
         -- Escreve outro valor
-        data_in <= to_unsigned(255, 17); -- Escreve 255 (0xFF)
+        pc_in <= to_unsigned(255, 17); -- Escreve 255 (0xFF)
         wait for clk_period;
         
         -- Desabilita escrita - valor deve permanecer
         wr_en <= '0';
-        data_in <= to_unsigned(500, 17); -- Tenta escrever 500 (0x1F4)
+        pc_in <= to_unsigned(500, 17); -- Tenta escrever 500 (0x1F4)
         wait for 20 ns;
         
         -- Reabilita escrita
         wr_en <= '1';
-        data_in <= to_unsigned(1024, 17); -- Escreve 1024 (0x400)
+        pc_in <= to_unsigned(1024, 17); -- Escreve 1024 (0x400)
         wait for clk_period;
         
         -- Testa reset durante operação
@@ -102,7 +102,7 @@ begin
         
         -- Escreve valor máximo para testar overflow
         wr_en <= '1';
-        data_in <= to_unsigned(131071, 17); -- Valor máximo para 17 bits (2^17 - 1)
+        pc_in <= to_unsigned(131071, 17); -- Valor máximo para 17 bits (2^17 - 1)
         wait for clk_period;
         
         wr_en <= '0';
