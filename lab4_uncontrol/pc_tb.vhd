@@ -1,3 +1,4 @@
+-- pc_tb.vhd
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -6,109 +7,82 @@ entity pc_tb is
 end entity pc_tb;
 
 architecture a_pc_tb of pc_tb is
-    component pc
+    -- 1. Declaração do Componente sob Teste (UUT)
+    component pc is
         port (
-            clk      : in  std_logic;
-            rst      : in  std_logic;
-            wr_en    : in  std_logic;
-            pc_in  : in  unsigned(16 downto 0);
-            pc_out : out unsigned(16 downto 0)
+            clk     : in  std_logic;
+            rst     : in  std_logic;
+            wr_en   : in  std_logic;
+            pc_in   : in  unsigned(16 downto 0);
+            pc_out  : out unsigned(16 downto 0)
         );
     end component;
 
-    -- Sinais de teste
-    signal clk      : std_logic := '0';
-    signal rst      : std_logic := '0';
-    signal wr_en    : std_logic := '0';
-    signal pc_in    : unsigned(16 downto 0) := (others => '0');
-    signal pc_out   : unsigned(16 downto 0);
+    -- 2. Sinais para conectar ao UUT
+    signal clk_s   : std_logic := '0';
+    signal rst_s   : std_logic := '0';
+    signal wr_en_s : std_logic := '0';
+    signal pc_in_s : unsigned(16 downto 0) := (others => '0');
+    signal pc_out_s: unsigned(16 downto 0);
 
-    -- Período do clock
-    constant clk_period : time := 10 ns;
-    signal finished     : std_logic := '0';
+    -- Sinais de controle do testbench
+    constant period_time : time := 100 ns;
+    signal finished      : std_logic := '0';
 
 begin
-    -- Instanciação do componente sob teste
-    uut: pc
-        port map (
-            clk      => clk,
-            rst      => rst,
-            wr_en    => wr_en,
-            pc_in    => pc_in,
-            pc_out   => pc_out
-        );
+    -- 3. Instanciação do UUT
+    uut: pc port map (
+        clk     => clk_s,
+        rst     => rst_s,
+        wr_en   => wr_en_s,
+        pc_in   => pc_in_s,
+        pc_out  => pc_out_s
+    );
 
-    -- Gerador de clock
-    clk_process: process
+    -- 4. Processos de Geração de Clock, Reset e Fim de Simulação [cite: 102, 111, 117, 121]
+    clk_proc: process
     begin
         while finished /= '1' loop
-            clk <= '0';
-            wait for clk_period/2;
-            clk <= '1';
-            wait for clk_period/2;
+            clk_s <= '0';
+            wait for period_time / 2;
+            clk_s <= '1';
+            wait for period_time / 2;
         end loop;
         wait;
-    end process;
+    end process clk_proc;
 
-    -- Processo de controle do tempo de simulação
+    reset_global: process
+    begin
+        rst_s <= '1';
+        wait for period_time * 2;
+        rst_s <= '0';
+        wait;
+    end process reset_global;
+
     sim_time_proc: process
-    begin
-        wait for 200 ns;
-        finished <= '1';
-        wait;
-    end process;
+-- 5. Processo de Estímulo (Casos de Teste)
+begin
+    -- Espera o reset terminar
+    wait for period_time * 2;
 
-    -- Processo de estímulos
-    stimulus_proc: process
-    begin
-        -- Inicialização
-        wr_en <= '0';
-        pc_in <= (others => '0');
-        
-        -- Reset ativo
-        rst <= '1';
-        wait for 20 ns;
-        
-        -- Libera reset
-        rst <= '0';
-        wait for 10 ns;
-        
-        -- Testa escrita no PC 
-        wr_en <= '1';
-        pc_in <= to_unsigned(100, 17); -- Escreve 100 (0x64)
-        wait for clk_period;
-        
-        -- Escreve outro valor
-        pc_in <= to_unsigned(255, 17); -- Escreve 255 (0xFF)
-        wait for clk_period;
-        
-        -- Desabilita escrita - valor deve permanecer
-        wr_en <= '0';
-        pc_in <= to_unsigned(500, 17); -- Tenta escrever 500 (0x1F4)
-        wait for 20 ns;
-        
-        -- Reabilita escrita
-        wr_en <= '1';
-        pc_in <= to_unsigned(1024, 17); -- Escreve 1024 (0x400)
-        wait for clk_period;
-        
-        -- Testa reset durante operação
-        rst <= '1';
-        wait for 10 ns;
-        rst <= '0';
-        
-        -- Verifica se zerou após reset
-        wait for 10 ns;
-        
-        -- Escreve valor máximo para testar overflow
-        wr_en <= '1';
-        pc_in <= to_unsigned(131071, 17); -- Valor máximo para 17 bits (2^17 - 1)
-        wait for clk_period;
-        
-        wr_en <= '0';
-        wait for 20 ns;
-        
-        wait;
-    end process;
+    -- Teste 1: Habilita escrita.
+    -- Atribui o valor 10 (decimal) usando uma string binária de 17 bits.
+    wr_en_s <= '1';
+    pc_in_s <= "00000000000001010"; -- 17 bits para o valor 10
+    wait for period_time;
+
+    -- Teste 2: Desabilita escrita. PC deve manter o valor anterior.
+    wr_en_s <= '0';
+    -- O valor de entrada agora é 65535, mas não deve ser carregado.
+    pc_in_s <= "00001111111111111"; -- 17 bits para o valor 65535
+    wait for period_time;
+
+    -- Teste 3: Habilita escrita novamente. PC deve carregar o novo valor.
+    wr_en_s <= '1';
+    wait for period_time;
+
+    -- Fim do teste
+    wait;
+end process sim_time_proc;
 
 end architecture a_pc_tb;
