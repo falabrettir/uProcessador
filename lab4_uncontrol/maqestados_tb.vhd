@@ -10,7 +10,6 @@ architecture a_maqestados_tb of maqestados_tb is
         port (
             clk      : in  std_logic;
             rst      : in  std_logic;
-            data_in  : in  std_logic;
             data_out : out std_logic
         );
     end component;
