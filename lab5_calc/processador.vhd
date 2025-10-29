@@ -53,7 +53,7 @@ architecture a_processador of processador is
            f_zero: out std_logic;
            f_carry: out std_logic
         );
-end component;
+    end component;
 
     component banco_9_regs is  
         port (
@@ -67,8 +67,26 @@ end component;
             data_r1      : out unsigned(15 downto 0);
             data_r2      : out unsigned(15 downto 0)
         );
-end component;
+    end component;
 
-
+    component uc is
+        port (
+            clk           : in  std_logic;                      
+            rst           : in  std_logic;                      
+        -- ir e pc
+            opcode_in     : in  unsigned(3 downto 0);          -- opcode [16:13] 
+            pc_atual_in   : in  unsigned(16 downto 0);          -- pc
+            const_5bit_in : in  unsigned(4 downto 0);          -- constante [4:0] 
+            const_13bit_in: in  unsigned(12 downto 0);         -- endereço [12:0] pro jump 
+    --saidas
+            pc_wr_en_out  : out std_logic;                      -- escrita no PC
+            ir_wr_en_out  : out std_logic;                      -- escrita no IR
+            reg_wr_en_out : out std_logic;                      -- escrita no banco
+            ula_chave_out : out std_logic_vector(1 downto 0);   -- operação da ula
+            sel_mux_ula_b_out : out std_logic;                  -- entrada B da ula
+            sel_mux_reg_wr_out: out std_logic;                 -- dado a escrever no banco, 0 ula 1 banco
+            pc_in_out     : out unsigned(16 downto 0)           -- próximo pc
+    );
+end component uc;
 
 end architecture a_processador;
