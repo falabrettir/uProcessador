@@ -89,4 +89,38 @@ architecture a_processador of processador is
     );
 end component uc;
 
+    signal s_pc_out      : unsigned(16 downto 0); -- PC -> Endereço ROM e PC atual UC
+    signal s_rom_out     : unsigned(16 downto 0); -- ROM -> IR
+    signal s_ir_out      : unsigned(16 downto 0); -- IR -> fatiador de instrucoes e entradas UC
+    signal s_next_pc     : unsigned(16 downto 0); -- UC -> PC prox
+
+    -- instrucao fatiada
+    signal s_opcode      : unsigned(3 downto 0);          -- [16:13] -> UC
+    signal s_reg_dest    : std_logic_vector(3 downto 0);  -- [12:9]  -> endereco escrita banco
+    signal s_reg_src1    : std_logic_vector(3 downto 0);  -- [8:5]   -> endereco leitura 1
+    signal s_reg_src2    : std_logic_vector(3 downto 0);  -- [4:1]   -> endereco leitura 2 
+    signal s_const_5bit  : unsigned(4 downto 0);          -- [4:0]   -> UC
+    signal s_const_13bit : unsigned(12 downto 0);         -- [12:0]  -> UC
+
+    -- dados
+    signal s_dados_r1    : unsigned(15 downto 0); -- 1 -> ULA
+    signal s_dados_r2    : unsigned(15 downto 0); -- 2 -> MUX B ULA
+    signal s_ula_out     : unsigned(15 downto 0); -- ULA -> MUX escrita banco
+    signal s_const_16bit : unsigned(15 downto 0); -- 5 bits estendida -> MUX B ULA e MUX banco
+    signal s_mux_ula_b   : unsigned(15 downto 0); -- MUX B ULA -> B ULA
+    signal s_mux_reg_wr  : unsigned(15 downto 0); -- MUX escrita banco -> escrita banco
+
+    -- controle
+    signal s_pc_wr_en    : std_logic; -- UC -> PC wr_en
+    signal s_ir_wr_en    : std_logic; -- UC -> IR wr_en
+    signal s_reg_wr_en   : std_logic; -- UC -> banco wr_en
+    signal s_ula_chave   : std_logic_vector(1 downto 0); -- UC -> ULA Chave
+    signal s_sel_mux_ula_b: std_logic; -- UC -> MUX B ULA
+    signal s_sel_mux_reg_wr: std_logic; -- UC -> Seletor MUX Escrita Banco
+
+    signal s_f_zero: std_logic;
+    signal s_f_carry:std_logic;
+begin 
+  
+
 end architecture a_processador;
