@@ -1,0 +1,8 @@
+FORMATO R: 
+[ OPCODE (4) | R_DEST (4) | R_SRC1 (4) | R_SRC2 (4) | X (1) ]
+
+FORMATO I:
+[ OPCODE (4) | R_DEST (4) | R_SRC1 (4) | IMEDIATO (5) ]
+
+FORMATO J:
+[ OPCODE (4) | ENDEREÇO (13 bits) ]
