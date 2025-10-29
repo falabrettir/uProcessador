@@ -12,7 +12,6 @@ entity processador is
 end entity processador;
 
 architecture a_processador of processador is 
-
  --componentes
     component pc is
         port (
@@ -78,6 +77,7 @@ architecture a_processador of processador is
             pc_atual_in   : in  unsigned(16 downto 0);          -- pc
             const_5bit_in : in  unsigned(4 downto 0);          -- constante [4:0] 
             const_13bit_in: in  unsigned(12 downto 0);         -- endereço [12:0] pro jump 
+            reg_src1_in: in std_logic_vector(3 downto 0);
     --saidas
             pc_wr_en_out  : out std_logic;                      -- escrita no PC
             ir_wr_en_out  : out std_logic;                      -- escrita no IR
@@ -200,7 +200,8 @@ begin
             ula_chave_out      => s_ula_chave,   -- vai para ULA
             sel_mux_ula_b_out  => s_sel_mux_ula_b, -- vai para controle do MUX B ULA
             sel_mux_reg_wr_out => s_sel_mux_reg_wr, -- vai para controle do MUX Escrita Banco
-            pc_in_out          => s_next_pc      -- vai para entrada PC
+            pc_in_out          => s_next_pc,      -- vai para entrada PC
+            reg_src1_in => s_reg_src1
         );
 
 

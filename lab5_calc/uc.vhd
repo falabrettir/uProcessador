@@ -11,6 +11,7 @@ entity uc is
         pc_atual_in   : in  unsigned(16 downto 0);          -- pc
         const_5bit_in : in  unsigned(4 downto 0);          -- constante [4:0] 
         const_13bit_in: in  unsigned(12 downto 0);         -- endereço [12:0] pro jump 
+        reg_src1_in: in std_logic_vector (3 downto 0);
 --saidas
         pc_wr_en_out  : out std_logic;                      -- escrita no PC
         ir_wr_en_out  : out std_logic;                      -- escrita no IR
@@ -70,8 +71,9 @@ state_instance: maq_estados
                        else '0'; --por padrao pega do registrador
 
     --mux do banco 
-      sel_mux_reg_wr_out <= '1' when (s_estado_atual = "10") and
-                            (opcode_in = "1000") --addi
+      sel_mux_reg_wr_out <= '1' when (s_estado_atual = "10") and 
+                            (opcode_in = "1000") and 
+                            (reg_src1_in = "0000") 
                           else '0'; --saida da ula
 
 end architecture a_uc;
