@@ -79,20 +79,20 @@ architecture a_processador of processador is
             const_13bit_in: in  unsigned(12 downto 0);         -- endereço [12:0] pro jump 
             reg_src1_in: in std_logic_vector(3 downto 0);
     --saidas
-            pc_wr_en_out  : out std_logic;                      -- escrita no PC
-            ir_wr_en_out  : out std_logic;                      -- escrita no IR
-            reg_wr_en_out : out std_logic;                      -- escrita no banco
-            ula_chave_out : out std_logic_vector(1 downto 0);   -- operação da ula
-            sel_mux_ula_b_out : out std_logic;                  -- entrada B da ula
-            sel_mux_reg_wr_out: out std_logic;                 -- dado a escrever no banco, 0 ula 1 banco
-            pc_in_out     : out unsigned(16 downto 0)           -- próximo pc
+            pc_wr_en_out  : out std_logic;                    
+            ir_wr_en_out  : out std_logic;                      
+            reg_wr_en_out : out std_logic;                      
+            ula_chave_out : out std_logic_vector(1 downto 0);   
+            sel_mux_ula_b_out : out std_logic;                 
+            sel_mux_reg_wr_out: out std_logic;                
+            pc_in_out     : out unsigned(16 downto 0)           
     );
 end component uc;
 
-    signal s_pc_out      : unsigned(16 downto 0); -- PC -> Endereço ROM e PC atual UC
-    signal s_rom_out     : unsigned(16 downto 0); -- ROM -> IR
-    signal s_ir_out      : unsigned(16 downto 0); -- IR -> fatiador de instrucoes e entradas UC
-    signal s_next_pc     : unsigned(16 downto 0); -- UC -> PC prox
+    signal s_pc_out      : unsigned(16 downto 0); 
+    signal s_rom_out     : unsigned(16 downto 0); 
+    signal s_ir_out      : unsigned(16 downto 0); 
+    signal s_next_pc     : unsigned(16 downto 0); 
 
     -- instrucao fatiada
     signal s_opcode      : unsigned(3 downto 0);          -- [16:13] -> UC
@@ -103,20 +103,20 @@ end component uc;
     signal s_const_13bit : unsigned(12 downto 0);         -- [12:0]  -> UC
 
     -- dados
-    signal s_dados_r1    : unsigned(15 downto 0); -- 1 -> ULA
-    signal s_dados_r2    : unsigned(15 downto 0); -- 2 -> MUX B ULA
-    signal s_ula_out     : unsigned(15 downto 0); -- ULA -> MUX escrita banco
-    signal s_const_16bit : unsigned(15 downto 0); -- 5 bits estendida -> MUX B ULA e MUX banco
-    signal s_mux_ula_b   : unsigned(15 downto 0); -- MUX B ULA -> B ULA
-    signal s_mux_reg_wr  : unsigned(15 downto 0); -- MUX escrita banco -> escrita banco
+    signal s_dados_r1    : unsigned(15 downto 0); 
+    signal s_dados_r2    : unsigned(15 downto 0); 
+    signal s_ula_out     : unsigned(15 downto 0); 
+    signal s_const_16bit : unsigned(15 downto 0); 
+    signal s_mux_ula_b   : unsigned(15 downto 0); 
+    signal s_mux_reg_wr  : unsigned(15 downto 0);
 
     -- controle
-    signal s_pc_wr_en    : std_logic; -- UC -> PC wr_en
-    signal s_ir_wr_en    : std_logic; -- UC -> IR wr_en
-    signal s_reg_wr_en   : std_logic; -- UC -> banco wr_en
-    signal s_ula_chave   : std_logic_vector(1 downto 0); -- UC -> ULA Chave
-    signal s_sel_mux_ula_b: std_logic; -- UC -> MUX B ULA
-    signal s_sel_mux_reg_wr: std_logic; -- UC -> Seletor MUX Escrita Banco
+    signal s_pc_wr_en    : std_logic;
+    signal s_ir_wr_en    : std_logic; 
+    signal s_reg_wr_en   : std_logic; 
+    signal s_ula_chave   : std_logic_vector(1 downto 0);
+    signal s_sel_mux_ula_b: std_logic;
+    signal s_sel_mux_reg_wr: std_logic;
 
     signal s_f_zero: std_logic;
     signal s_f_carry:std_logic;
@@ -181,9 +181,9 @@ begin
             a        => s_dados_r1,    -- vem do Banco (leitura 1)
             b        => s_mux_ula_b,   -- vem do MUX B
             chave    => s_ula_chave,   -- vem da UC
-            u_output => s_ula_out,     -- vai para MUX de escrita do Banco
-            f_zero   => s_f_zero,      -- flag (não usada ainda, mas conectada)
-            f_carry  => s_f_carry      -- flag (não usada ainda, mas conectada)
+            u_output => s_ula_out,    
+            f_zero   => s_f_zero,     
+            f_carry  => s_f_carry     
         );
 
     inst_uc: uc

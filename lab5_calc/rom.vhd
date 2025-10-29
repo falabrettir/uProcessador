@@ -31,7 +31,7 @@ architecture a_rom of rom is
       
       -- ADD R5, R3, R4
       -- Opcode=0001, Dest=R5(0101), Src1=R3(0011), Src2=R4(0100), X=0
-      2  => "00010101001101000", -- <== Ponto de Loop (Endereço 2)
+      2  => "00010101001101000", --
       
       -- SUBI R5, R5, 1
       -- Opcode=1001, Dest=R5(0101), Src1=R5(0101), Imm5=1(00001)
@@ -51,7 +51,7 @@ architecture a_rom of rom is
       -- Opcode=1000, Dest=R3(0011), Src1=R5(0101), Imm5=0(00000)
       20 => "10000011010100000",
       
-      -- (JUMP 2
+      -- JUMP 2
       -- Opcode=1111, Addr13=2(0000000000010)
       21 => "11110000000000010",
       
