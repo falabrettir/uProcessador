@@ -43,12 +43,12 @@ state_instance: maq_estados
           estado => s_estado_atual
     );
 
-  ir_wr_en_out <= '1' when s_estado_atual = "00" else '0'; --fetch
+  ir_wr_en_out <= '1' when s_estado_atual = "01" else '0'; --fetch
 
-  pc_wr_en_out <= '1' when s_estado_atual = "01" else '0'; --decode
+  pc_wr_en_out <= '1' when s_estado_atual = "10" else '0'; --decode
 
-  pc_in_out <= ("0000" & const_13bit_in) when (s_estado_atual = "01" and opcode_in = "1111") else --jump
-               (pc_atual_in + 1) when (s_estado_atual = "01") else --pc + 1
+  pc_in_out <= ("0000" & const_13bit_in) when (s_estado_atual = "10" and opcode_in = "1111") else --jump
+               (pc_atual_in + 1) when (s_estado_atual = "10") else --pc + 1
                pc_atual_in; --mantem
 
   --controle do banco
