@@ -35,7 +35,8 @@ architecture a_uc of uc is
     );
   end component;
 
-  signal s_estado_atual: unsigned(1 downto 0);
+ signal s_pc_offset_ext : unsigned(16 downto 0); 
+ signal s_estado_atual: unsigned(1 downto 0);
 
 begin
 
@@ -45,6 +46,8 @@ state_instance: maq_estados
           rst => rst,
           estado => s_estado_atual
     );
+
+  s_pc_offset_ext <= unsigned(resize(signed(const_13bit_in), 17));
 
   ir_wr_en_out <= '1' when s_estado_atual = "01" else '0'; --fetch
 
@@ -69,7 +72,7 @@ pc_in_out <= ("0000" & const_13bit_in) when (s_estado_atual = "10" and opcode_in
     
     --controele da ull 
 ula_chave_out <= "00" when (s_estado_atual = "10") and (opcode_in = "0001" or opcode_in = "1000") else --add e addi 
-                 "01" when (s_estado_atual = "10") and (opcode_in = "0010" or -- sub
+                 "01" when (s_estado_atual = "10") and (opcode_in = "0010" or -- sub
                   opcode_in = "1001" or -- subi 
                   opcode_in = "0011") else 
                   "00"; -- nop, jump etc
