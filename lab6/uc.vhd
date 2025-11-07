@@ -59,7 +59,7 @@ pc_in_out <= ("0000" & const_13bit_in) when (s_estado_atual = "10" and opcode_in
              (pc_atual_in + 1) when (s_estado_atual = "10") else 
              pc_atual_in;
 
-  flags_wr_en_out <= '1' when (s_estado_atual = "10" and opcode_in = "0011") else -- Ativo no Execute APENAS para CMPR
+  flags_wr_en_out <= '1' when (s_estado_atual = "10" and opcode_in = "0011") else 
                    '0';
 
   --controle do banco
