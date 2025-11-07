@@ -56,15 +56,15 @@ architecture a_processador of processador is
 
     component banco_9_regs is  
         port (
-            clk          : in  std_logic;
-            rst          : in  std_logic;
-            wr_en        : in  std_logic;
-            addr_wr      : in  std_logic_vector(3 downto 0);
-            ra1          : in  std_logic_vector(3 downto 0);
-            ra2          : in  std_logic_vector(3 downto 0);
-            data_wr      : in  unsigned(15 downto 0);
-            data_r1      : out unsigned(15 downto 0);
-            data_r2      : out unsigned(15 downto 0)
+            clk         : in  std_logic;
+            rst         : in  std_logic;
+            wr_en       : in  std_logic;
+            addr_wr     : in  std_logic_vector(3 downto 0);
+            ra1         : in  std_logic_vector(3 downto 0);
+            ra2         : in  std_logic_vector(3 downto 0);
+            data_wr     : in  unsigned(15 downto 0);
+            data_r1     : out unsigned(15 downto 0);
+            data_r2     : out unsigned(15 downto 0)
         );
     end component;
 
@@ -77,66 +77,74 @@ architecture a_processador of processador is
             pc_atual_in   : in  unsigned(16 downto 0);          -- pc
             const_5bit_in : in  unsigned(4 downto 0);          -- constante [4:0] 
             const_13bit_in: in  unsigned(12 downto 0);         -- endereço [12:0] pro jump 
-            reg_src1_in: in std_logic_vector(3 downto 0);
+            reg_src1_in: in std_logic_vector (3 downto 0);
+        
+            -- Novas Entradas de Flag
+            flag_z_in     : in  std_logic;
+            flag_c_in     : in  std_logic;
     --saidas
-            pc_wr_en_out  : out std_logic;                    
+            pc_wr_en_out  : out std_logic;                      
             ir_wr_en_out  : out std_logic;                      
-            reg_wr_en_out : out std_logic;                      
+            reg_wr_en_out : out std_logic;
+            
+            -- Nova Saída de Flag
+            flags_wr_en_out: out std_logic;
+
             ula_chave_out : out std_logic_vector(1 downto 0);   
             sel_mux_ula_b_out : out std_logic;                 
             sel_mux_reg_wr_out: out std_logic;                
             pc_in_out     : out unsigned(16 downto 0)           
     );
-end component uc;
-component registrador_flags is 
-    port (
-        clk     : in  std_logic;
-        rst     : in  std_logic;
-        wr_en   : in  std_logic;
-        data_zero       : in  std_logic;
-        data_carry : in std_logic;
+    end component uc;
 
-        zero_out: out std_logic;
-        carry_out: out std_logic
-    );
-end component registrador_flags; 
+    component registrador_flags is 
+        port (
+            clk        : in  std_logic;
+            rst        : in  std_logic;
+            wr_en      : in  std_logic;
+            data_zero  : in  std_logic;
+            data_carry : in  std_logic;
+            zero_out   : out std_logic;
+            carry_out  : out std_logic
+        );
+    end component;
 
-    signal s_pc_out      : unsigned(16 downto 0); 
-    signal s_rom_out     : unsigned(16 downto 0); 
-    signal s_ir_out      : unsigned(16 downto 0); 
-    signal s_next_pc     : unsigned(16 downto 0); 
+    signal s_pc_out      : unsigned(16 downto 0); -- PC -> Endereço ROM e PC atual UC
+    signal s_rom_out     : unsigned(16 downto 0); -- ROM -> IR
+    signal s_ir_out      : unsigned(16 downto 0); -- IR -> fatiador de instrucoes e entradas UC
+    signal s_next_pc     : unsigned(16 downto 0); -- UC -> PC prox
 
     -- instrucao fatiada
-    signal s_opcode      : unsigned(3 downto 0);          -- [16:13] -> UC
-    signal s_reg_dest    : std_logic_vector(3 downto 0);  -- [12:9]  -> endereco escrita banco
-    signal s_reg_src1    : std_logic_vector(3 downto 0);  -- [8:5]   -> endereco leitura 1
-    signal s_reg_src2    : std_logic_vector(3 downto 0);  -- [4:1]   -> endereco leitura 2 
-    signal s_const_5bit  : unsigned(4 downto 0);          -- [4:0]   -> UC
-    signal s_const_13bit : unsigned(12 downto 0);         -- [12:0]  -> UC
+    signal s_opcode      : unsigned(3 downto 0);        -- [16:13] -> UC
+    signal s_reg_dest    : std_logic_vector(3 downto 0); -- [12:9]  -> endereco escrita banco
+    signal s_reg_src1    : std_logic_vector(3 downto 0); -- [8:5]   -> endereco leitura 1
+    signal s_reg_src2    : std_logic_vector(3 downto 0); -- [4:1]   -> endereco leitura 2 
+    signal s_const_5bit  : unsigned(4 downto 0);        -- [4:0]   -> UC
+    signal s_const_13bit : unsigned(12 downto 0);       -- [12:0]  -> UC
 
     -- dados
-    signal s_dados_r1    : unsigned(15 downto 0); 
-    signal s_dados_r2    : unsigned(15 downto 0); 
-    signal s_ula_out     : unsigned(15 downto 0); 
-    signal s_const_16bit : unsigned(15 downto 0); 
-    signal s_mux_ula_b   : unsigned(15 downto 0); 
-    signal s_mux_reg_wr  : unsigned(15 downto 0);
+    signal s_dados_r1    : unsigned(15 downto 0); -- 1 -> ULA
+    signal s_dados_r2    : unsigned(15 downto 0); -- 2 -> MUX B ULA
+    signal s_ula_out     : unsigned(15 downto 0); -- ULA -> MUX escrita banco
+    signal s_const_16bit : unsigned(15 downto 0); -- 5 bits estendida -> MUX B ULA e MUX banco
+    signal s_mux_ula_b   : unsigned(15 downto 0); -- MUX B ULA -> B ULA
+    signal s_mux_reg_wr  : unsigned(15 downto 0); -- MUX escrita banco -> escrita banco
 
     -- controle
-    signal s_pc_wr_en    : std_logic;
-    signal s_ir_wr_en    : std_logic; 
-    signal s_reg_wr_en   : std_logic; 
-    signal s_ula_chave   : std_logic_vector(1 downto 0);
-    signal s_sel_mux_ula_b: std_logic;
-    signal s_sel_mux_reg_wr: std_logic;
+    signal s_pc_wr_en    : std_logic; -- UC -> PC wr_en
+    signal s_ir_wr_en    : std_logic; -- UC -> IR wr_en
+    signal s_reg_wr_en   : std_logic; -- UC -> banco wr_en
+    signal s_ula_chave   : std_logic_vector(1 downto 0); -- UC -> ULA Chave
+    signal s_sel_mux_ula_b: std_logic; -- UC -> MUX B ULA
+    signal s_sel_mux_reg_wr: std_logic; -- UC -> Seletor MUX Escrita Banco
+
+    -- Fios para flags
+    signal s_flags_wr_en : std_logic;
+    signal s_flag_z_out  : std_logic;
+    signal s_flag_c_out  : std_logic;
 
     signal s_f_zero: std_logic;
     signal s_f_carry:std_logic;
-    
-    -- reg de flags
-    signal s_flags_wr_en: std_logic; --da uc
-    signal s_flag_z_out: std_logic; --pra uc
-    signal s_flag_c_out: std_logic; --pra uc
 begin 
  
 -- fatiada na instrucao
@@ -147,7 +155,7 @@ begin
   s_const_5bit <= s_ir_out(4 downto 0);
   s_const_13bit <= s_ir_out (12 downto 0);
 
-  s_const_16bit <=unsigned(resize(signed(s_const_5bit), 16)); --por causa dos negativos em cpl 2 
+  s_const_16bit <= unsigned(resize(signed(s_const_5bit), 16)); --por causa dos negativos em cpl 2 
 
   s_mux_ula_b <= s_const_16bit when s_sel_mux_ula_b = '1' else 
                  s_dados_r2;
@@ -190,7 +198,7 @@ begin
             ra2     => s_reg_src2,             -- vem do IR fatiado
             data_wr => s_mux_reg_wr,           -- vem do MUX de escrita
             data_r1 => s_dados_r1,             -- vai para ULA entrada A
-            data_r2 => s_dados_r2              -- vai para MUX B da ULA
+            data_r2 => s_dados_r2               -- vai para MUX B da ULA
         );
 
     inst_ula: ula
@@ -203,6 +211,17 @@ begin
             f_carry  => s_f_carry     
         );
 
+    inst_flags: registrador_flags
+        port map (
+            clk        => clk,
+            rst        => rst,
+            wr_en      => s_flags_wr_en,
+            data_zero  => s_f_zero,
+            data_carry => s_f_carry,
+            zero_out   => s_flag_z_out,
+            carry_out  => s_flag_c_out
+        );
+
     inst_uc: uc
         port map (
             clk                => clk,
@@ -211,24 +230,21 @@ begin
             pc_atual_in        => s_pc_out,      -- vem do PC
             const_5bit_in      => s_const_5bit,  -- vem do IR fatiado
             const_13bit_in     => s_const_13bit, -- vem do IR fatiado
+            reg_src1_in        => s_reg_src1,
+
+            -- Adicione as conexões de flag que faltam
+            flag_z_in          => s_flag_z_out,
+            flag_c_in          => s_flag_c_out,
+
+            -- Saídas
             pc_wr_en_out       => s_pc_wr_en,    -- vai para PC
             ir_wr_en_out       => s_ir_wr_en,    -- vai para IR
             reg_wr_en_out      => s_reg_wr_en,   -- vai para Banco
+            flags_wr_en_out    => s_flags_wr_en,
             ula_chave_out      => s_ula_chave,   -- vai para ULA
-            sel_mux_ula_b_out  => s_sel_mux_ula_b, -- vai para controle do MUX B ULA
-            sel_mux_reg_wr_out => s_sel_mux_reg_wr, -- vai para controle do MUX Escrita Banco
-            pc_in_out          => s_next_pc,      -- vai para entrada PC
-            reg_src1_in => s_reg_src1
-        );
-    inst_flags: registrador_flags
-        port map(
-             clk => clk,
-             rst => rst, 
-             wr_en => s_flags_wr_en,
-             data_zero => s_f_zero,
-             data_carry => s_f_carry,
-             zero_out => s_flag_z_out,
-             carry_out => s_flag_c_out
+            sel_mux_ula_b_out  => s_sel_mux_ula_b, 
+            sel_mux_reg_wr_out => s_sel_mux_reg_wr,
+            pc_in_out          => s_next_pc
         );
 
 
