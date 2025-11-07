@@ -65,7 +65,6 @@ architecture a_processador of processador is
         );
     end component;
 
-    -- <<< DECLARAÇÃO DO COMPONENTE UC CORRIGIDA >>>
     component uc is
         port (
             clk           : in  std_logic;                      
@@ -130,7 +129,6 @@ architecture a_processador of processador is
     signal s_sel_mux_ula_b: std_logic;
     signal s_sel_mux_reg_wr: std_logic;
     
-    -- <<< SINAIS DE FLAG (SEM DUPLICADOS) >>>
     signal s_flags_wr_en : std_logic; -- UC -> wr_en do Reg. Flags
     signal s_flag_z_out  : std_logic; -- Reg. Flags -> UC
     signal s_flag_c_out  : std_logic; -- Reg. Flags -> UC
@@ -216,7 +214,6 @@ begin
              carry_out  => s_flag_c_out
         );
 
-  -- <<< INSTÂNCIA UC CORRIGIDA >>>
   inst_uc: uc
         port map (
             clk                => clk,
