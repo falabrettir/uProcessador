@@ -125,8 +125,8 @@ begin
 -- fatiada na instrucao
   s_opcode <= s_ir_out (16 downto 13);
   s_reg_dest <= std_logic_vector(s_ir_out(12 downto 9));
-  s_reg_src1 <= std_logic_vector(s_ir_out(8 downto 5));
-  s_reg_src2 <= std_logic_vector(s_ir_out(4 downto 1));
+  s_reg_src1 <= std_logic_vector(s_ir_out(12 downto 9));
+  s_reg_src2 <= std_logic_vector(s_ir_out(8 downto 5));
   s_const_5bit <= s_ir_out(4 downto 0);
   s_const_13bit <= s_ir_out (12 downto 0);
 

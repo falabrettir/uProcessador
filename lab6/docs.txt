@@ -8,7 +8,7 @@ Especificação da Codificação das Instruções (ISA - 17 bits)
 FORMATO DAS INSTRUCOES
 
 FORMATO R: 
-[ OPCODE (4) | R_DEST (4) | R_SRC1 (4) | R_SRC2 (4) | X (1) ]
+[ OPCODE (4) | R_DSRC1 (4) | R_SRC2 (4) | X (5) ]
 
 FORMATO I:
 [ OPCODE (4) | R_DEST (4) | R_SRC1 (4) | IMEDIATO (5) ]
@@ -19,8 +19,8 @@ FORMATO J:
 | Instrução           | Opcode [16:13] | Formato | Operação (RTL)                   
 | :------------------ | :------------- | :------ | :------------------------------- 
 | NOP                 | 0000           | R       | Nenhuma                          
-| ADD Rs, Rt, Rd      | 0001           | R       | Rs <= Rt + Rd                    
-| SUB Rs, Rt, Rd      | 0010           | R       | Rs <= Rt - Rd                    
+| ADD Rs, Rt          | 0001           | R       | Rs <= Rt + Rs                    
+| SUB Rs, Rt          | 0010           | R       | Rs <= Rt - Rs                    
 | ADDI Rt, Rs, Imm5   | 1000           | I       | Rt <= Rs + Imm5        
 | SUBI Rt, Rs, Imm5   | 1001           | I       | Rt <= Rs - Imm5       
 | LD Rt, Imm5         | 1000           | I       | Rt <= R0 + Imm5       
