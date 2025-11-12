@@ -142,17 +142,20 @@ begin
 -- fatiada na instrucao
   s_opcode      <= s_ir_out(16 downto 13);
   s_reg_dest    <= std_logic_vector(s_ir_out(12 downto 9));
-  s_reg_src1    <= std_logic_vector(s_ir_out(12 downto 9));
+
+  s_reg_src1    <= std_logic_vector(s_ir_out(8 downto 5)) when s_opcode = "1000" or s_opcode = "1001" else
+                   std_logic_vector(s_ir_out(12 downto 9)); --tipo R
+
   s_reg_src2    <= std_logic_vector(s_ir_out(8 downto 5));
   s_const_5bit  <= s_ir_out(4 downto 0);
   s_const_13bit <= s_ir_out(12 downto 0);
 
-  s_const_16bit <= unsigned(resize(signed(s_const_5bit), 16)); --por causa dos negativos em cpl 2 
+  s_const_16bit <= unsigned(resize(unsigned(s_const_5bit), 16)); --por causa dos negativos em cpl 2 
 
   s_mux_ula_b <= s_const_16bit when s_sel_mux_ula_b = '1' else 
                  s_dados_r2;
 
-  s_mux_reg_wr <= s_const_16bit when s_sel_mux_reg_wr = '1' and s_reg_src1 = "0000" else -- Apenas para LD (ADDI R, R0, Imm)
+  s_mux_reg_wr <= s_const_16bit when s_sel_mux_reg_wr = '1' else -- Apenas para LD (ADDI R, R0, Imm)
                   s_ula_out; -- Para ADD, SUB, e MOV (ADDI R, R, 0)
 
   inst_pc: pc

@@ -49,7 +49,7 @@ begin
     sim_time_proc: process
     begin
         -- deixa a simulação rodar por tempo suficiente para ver o loop
-        wait for c_clk_period * 100; -- roda por 100 ciclos (10 us)
+        wait for c_clk_period * 1000; -- roda por 100 ciclos (10 us)
         s_finished <= '1';
         wait;
     end process sim_time_proc;

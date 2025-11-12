@@ -35,7 +35,7 @@ begin
           r_or when chave = "11" else
           (others => '0');
           
-f_zero <= '1' when temp = "0000000000000000" else '0';
+  f_zero <= '1' when temp = "0000000000000000" else '0';
   
   f_carry <= r_s_ext(16) when chave = "00" else
              '1' when chave = "01" and a < b else

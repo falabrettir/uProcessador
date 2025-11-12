@@ -55,7 +55,7 @@ state_instance: maq_estados
 
 pc_in_out <= ("0000" & const_13bit_in) when (s_estado_atual = "10" and opcode_in = "1111") else 
              (pc_atual_in + 1 + s_pc_offset_ext) when (s_estado_atual = "10" and opcode_in = "1100" and flag_z_in = '0') else 
-             (pc_atual_in + 1 + s_pc_offset_ext) when (s_estado_atual = "10" and opcode_in = "1101" and flag_c_in = '0') else 
+             (pc_atual_in + 1 + s_pc_offset_ext) when (s_estado_atual = "10" and opcode_in = "1101" and flag_c_in = '1') else 
              (pc_atual_in + 1) when (s_estado_atual = "10") else 
              pc_atual_in;
 
