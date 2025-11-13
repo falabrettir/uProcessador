@@ -1,0 +1,52 @@
+Especificação da Codificação das Instruções (ISA - 17 bits)
+
+- Largura da Instrução: 17 bits
+- Largura de Dados: 16 bits
+- Número de Registadores de Uso Geral: 9 (R0 a R8), endereçados com 4 bits. R0 é fixo em zero por convenção de software (hardware não força).
+- Endereçamento Imediato: Complemento de 2.
+
+FORMATO DAS INSTRUCOES
+
+FORMATO R: 
+[ OPCODE (4) | R_DSRC1 (4) | R_SRC2 (4) | X (5) ]
+
+FORMATO I:
+[ OPCODE (4) | R_DEST (4) | R_SRC1 (4) | IMEDIATO (5) ]
+
+FORMATO J:
+[ OPCODE (4) | ENDEREÇO (13 bits) ]
+
+| Instrução           | Opcode [16:13] | Formato | Operação (RTL)                   
+| :------------------ | :------------- | :------ | :------------------------------- 
+| NOP                 | 0000           | R       | Nenhuma                          
+| ADD Rs, Rt          | 0001           | R       | Rs <= Rt + Rs                    
+| SUB Rs, Rt          | 0010           | R       | Rs <= Rt - Rs                    
+| ADDI Rt, Rs, Imm5   | 1000           | I       | Rt <= Rs + Imm5        
+| SUBI Rt, Rs, Imm5   | 1001           | I       | Rt <= Rs - Imm5       
+| LD Rt, Imm5         | 1000           | I       | Rt <= R0 + Imm5       
+| MOV Rt, Rs          | 1000           | I       | Rt <= Rs + 0                    
+| JMP Endereco13      | 1111           | J       | PC <= "0000" & Endereco13        
+| CMPR                | 0011           | R       | Flags <= Rt-Rd
+| BNE Endereco13      | 1100           | J       | RTL <= se (Z_flag == 0) PC += 1 + Endereco13 (relativo)
+| BLO Endereco13      | 1101           | J       | RTL <= se (C_flag == 0) PC += 1 + Endereco13 (relativo)
+
+- A instrução `SUB` (0010) foi definida na ISA mas não é usada
+
+
+PROGRAMA NA ROM: 
+
+ADDI R3, R0, 0  "1000_0011_0000_00000"
+ADDI R4, R0, 0  "1000_0100_0000_00000"
+ADD R4, R3, R4  "0001_0100_0011_0100_0"
+ADDI R3, R3, 1  "1000_0011_0011_00001"
+ADDI R2, R0, 30 "1000_0010_0000_11110"
+CMPR RX, R3, R2 "0011_0000_0011_0010_0"
+BLO R3, -4      "1101_1111111111110" --VOLTA PRA INSTRUCAO "C"
+ADD R5, R4, R0  "0001_0101_0100_0000_0"
+
+A. Carrega R3 (o registrador 3) com o valor 0
+B. Carrega R4 com 0
+C. Soma R3 com R4 e guarda em R4
+D. Soma 1 em R3
+E. Se R3<30 salta para a instrução do passo C * 
+F. Copia valor de R4 para R5
