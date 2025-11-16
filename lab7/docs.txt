@@ -21,10 +21,8 @@ FORMATO J:
 | NOP                 | 0000           | R       | Nenhuma                          
 | ADD Rs, Rt          | 0001           | R       | Rs <= Rt + Rs                    
 | SUB Rs, Rt          | 0010           | R       | Rs <= Rt - Rs                    
-| ADDI Rt, Rs, Imm5   | 1000           | I       | Rt <= Rs + Imm5        
-| SUBI Rt, Rs, Imm5   | 1001           | I       | Rt <= Rs - Imm5       
-| LD Rt, Imm5         | 1000           | I       | Rt <= R0 + Imm5       
-| MOV Rt, Rs          | 1000           | I       | Rt <= Rs + 0                    
+| LD Rt, Imm5         | 1000           | I       | Rt <= Imm5       
+| MOV Rt, Rs          | 1110           | I       | Rt <= Rs + 0                    
 | JMP Endereco13      | 1111           | J       | PC <= "0000" & Endereco13        
 | CMPR                | 0011           | R       | Flags <= Rt-Rd
 | BNE Endereco13      | 1100           | J       | RTL <= se (Z_flag == 0) PC += 1 + Endereco13 (relativo)
