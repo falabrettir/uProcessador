@@ -2,49 +2,40 @@ Especificação da Codificação das Instruções (ISA - 17 bits)
 
 - Largura da Instrução: 17 bits
 - Largura de Dados: 16 bits
-- Número de Registadores de Uso Geral: 9 (R0 a R8), endereçados com 4 bits. R0 é fixo em zero por convenção de software (hardware não força).
-- Endereçamento Imediato: Complemento de 2.
+- Número de Registradores: 9 (R0 a R8)
+- Convenção: R0 não é fixo em zero pelo hardware (pode ser escrito), mas usado como base.
+- Lógica Aritmética: O processador opera predominantemente no modo "Acumulador de 2 Operandos" (Dest <= Dest OP Src) para atender às restrições de sorteio.
 
-FORMATO DAS INSTRUCOES
+FORMATO DAS INSTRUÇÕES
 
-FORMATO R: 
-[ OPCODE (4) | R_DSRC1 (4) | R_SRC2 (4) | X (5) ]
+FORMATO R (Registrador-Registrador): 
+[ OPCODE (4) | DEST/SRC1 (4) | SRC2 (4) | X (5) ]
+Bits: [16:13] | [12:9]        | [8:5]    | [4:0]
 
-FORMATO I:
-[ OPCODE (4) | R_DEST (4) | R_SRC1 (4) | IMEDIATO (5) ]
+FORMATO I (Imediato):
+[ OPCODE (4) | DEST (4) | SRC1 (4) | IMEDIATO (5) ]
+Bits: [16:13] | [12:9]   | [8:5]    | [4:0] (Compl. de 2)
 
-FORMATO J:
-[ OPCODE (4) | ENDEREÇO (13 bits) ]
+FORMATO J (Salto):
+[ OPCODE (4) | ENDEREÇO (13) ]
+Bits: [16:13] | [12:0]
 
-| Instrução           | Opcode [16:13] | Formato | Operação (RTL)                   
-| :------------------ | :------------- | :------ | :------------------------------- 
-| NOP                 | 0000           | R       | Nenhuma                          
-| ADD Rs, Rt          | 0001           | R       | Rs <= Rt + Rs                    
-| SUB Rs, Rt          | 0010           | R       | Rs <= Rt - Rs                    
-| LD Rt, Imm5         | 1000           | I       | Rt <= Imm5       
-| MOV Rt, Rs          | 1110           | I       | Rt <= Rs + 0                    
-| JMP Endereco13      | 1111           | J       | PC <= "0000" & Endereco13        
-| CMPR                | 0011           | R       | Flags <= Rt-Rd
-| BNE Endereco13      | 1100           | J       | RTL <= se (Z_flag == 0) PC += 1 + Endereco13 (relativo)
-| BLO Endereco13      | 1101           | J       | RTL <= se (C_flag == 0) PC += 1 + Endereco13 (relativo)
+| Instrução           | Opcode | FMT | Operação (Hardware RTL)                                |
+| :------------------ | :----- | :-- | :----------------------------------------------------- |
+| NOP                 | 0000   | R   | Nenhuma                                                |
+| ADD  Rt, Rs         | 0001   | R   | Rt <= Rt + Rs  (Acumula soma em Rt)                    |
+| SUB  Rt, Rs         | 0010   | R   | Rt <= Rt - Rs  (Acumula subtração em Rt)               |
+| CLR  Rt             | 0010   | R   | Pseudoinstrução: SUB Rt, Rt (Zera registrador)         |
+| CMPR Rt, Rs         | 0011   | R   | Flags <= Rt - Rs                                       |
+| OR   Rt, Rs         | 0100   | R   | Rt <= Rt OR Rs (Acumula OR lógico)                     |
+| LW   Rt, (Rs)       | 0111   | I   | Rt <= RAM[Rs] (Lê da memória)                          |
+| ADDI Rt, Imm        | 1000   | I   | Rt <= Rs + Imm (Soma Imediata)                         |
+| LD   Rt, Imm        | 1000   | I   | Pseudoinstrução: CLR Rt; ADDI Rt, Imm                  |
+| SW   Rt, (Rs)       | 1011   | I   | RAM[Rs] <= Rt (Escreve na memória)                     |
+| BNE  Offset         | 1100   | J   | Se Z=0, PC <= PC + 1 + Offset                          |
+| BLO  Offset         | 1101   | J   | Se C=1, PC <= PC + 1 + Offset (Branch if Lower/Borrow) |
+| MOV  Rt, Rs         | 1110   | I   | Rt <= Rs + 0 (Cópia via ULA com Imediato 0)            |
+| JMP  Endereco       | 1111   | J   | PC <= Endereco                                         |
 
-- A instrução `SUB` (0010) foi definida na ISA mas não é usada
 
 
-PROGRAMA NA ROM: 
-
-ADDI R3, R0, 0  "1000_0011_0000_00000"
-ADDI R4, R0, 0  "1000_0100_0000_00000"
-ADD R4, R3, R4  "0001_0100_0011_0100_0"
-ADDI R3, R3, 1  "1000_0011_0011_00001"
-ADDI R2, R0, 30 "1000_0010_0000_11110"
-CMPR RX, R3, R2 "0011_0000_0011_0010_0"
-BLO R3, -4      "1101_1111111111110" --VOLTA PRA INSTRUCAO "C"
-ADD R5, R4, R0  "0001_0101_0100_0000_0"
-
-A. Carrega R3 (o registrador 3) com o valor 0
-B. Carrega R4 com 0
-C. Soma R3 com R4 e guarda em R4
-D. Soma 1 em R3
-E. Se R3<30 salta para a instrução do passo C * 
-F. Copia valor de R4 para R5

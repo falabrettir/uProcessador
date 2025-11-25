@@ -14,38 +14,93 @@ architecture a_rom of rom is
    type mem is array (0 to 127) of unsigned(16 downto 0);
    constant conteudo_rom : mem := (
       
-        0  => "10000001000000101", -- LD R1, 5   (Dado A)
-        1  => "10000010000000010", -- LD R2, 2   (Endereço A)
-        2  => "10000011000000111", -- LD R3, 7   (Dado B)
-        3  => "10000100000000101", -- LD R4, 5   (Endereço B)
-        4  => "10000101000001100", -- LD R5, 12  (Dado C)
-        5  => "10000110000001001", -- LD R6, 9   (Endereço C)
-        6  => "10000111000001111", -- LD R7, 15  (Dado D)
-        7  => "10001000000001100", -- LD R8, 12  (Endereço D)
+-- 0: CLR R1 (Zera R1)
+      -- Bin: 0010(SUB) 0001(R1) 0001(R1) 0001(R1) 0
+      0  => "00100001000100010", 
 
-        -- Múltiplas escritas na RAM
-        -- Formato: sw Rt, (Rs) (1011 | Rt(dado) | Rs(addr) | XXXXX)
-        8  => "10110001001000000", -- sw R1, (R2)  (Escreve 5 no endereço 2)
-        9  => "10110011010000000", -- sw R3, (R4)  (Escreve 7 no endereço 5)
-        10 => "10110101011000000", -- sw R5, (R6)  (Escreve 12 no endereço 9)
-        11 => "10110111100000000", -- sw R7, (R8)  (Escreve 15 no endereço 12)
+      -- 1: ADDI R1, 15 (R1 = 0 + 15 = 15)
+      -- Bin: 1000(ADDI) 0001(Dest R1) 0001(Src R1) 01111(15)
+      1  => "10000001000101111",
 
-        -- Limpar registradores de dados
-        -- (Garante que a leitura da RAM é a nova fonte)
-        12 => "10000001000000000", -- LD R1, 0  
-        13 => "10000011000000000", -- LD R3, 0  
-        14 => "10000101000000000", -- LD R5, 0  
-        15 => "10000111000000000", -- LD R7, 0
+      -- 2: ADDI R1, 15 (R1 = 15 + 15 = 30)
+      2  => "10000001000101111",
 
-        -- Formato: lw Rt, (Rs) (0111 | Rt(dest) | Rs(addr) | XXXXX)
-        16 => "01110001001000000", -- lw R1, (R2)  (Lê do end 2 -> R1 deve ser 5)
-        17 => "01110011010000000", -- lw R3, (R4)  (Lê do end 5 -> R3 deve ser 7)
-        18 => "01110101011000000", -- lw R5, (R6)  (Lê do end 9 -> R5 deve ser 12)
-        19 => "01110111100000000", -- lw R7, (R8)  (Lê do end 12 -> R7 deve ser 15)
+      -- 3: ADDI R1, 15 (R1 = 45)
+      3  => "10000001000101111",
 
-        20 => "11110000000000000", -- JMP 0         (Loop infinito, sugestão de fim de programa)
-      
-      --NOP
+      -- 4: ADDI R1, 15 (R1 = 60)
+      4  => "10000001000101111",
+
+      -- 5: ADDI R1, 15 (R1 = 75)
+      5  => "10000001000101111",
+
+      -- 6: ADDI R1, 4 (R1 = 75 + 4 = 79) -> PONTEIRO OK!
+      6  => "10000001000100100",
+
+      -- ========================================================================
+      -- 2. TESTE DE RAM E MOV (Escrever e Ler)
+      -- Vamos escrever 10 na RAM[79]
+      -- ========================================================================
+
+      -- 7: CLR R2 (Limpa R2)
+      7  => "00100010001000100",
+
+      -- 8: ADDI R2, 10 (R2 = 10)
+      8  => "10000010001001010",
+
+      -- 9: MOV R3, R2 (Copia R2 para R3. R3 = 10)
+      -- Op 1110. Dest R3, Src R2.
+      9  => "11100011001000000",
+
+      -- 10: SW R3, 0(R1) -> Grava 10 no endereço 79
+      -- Op 1011. Data R3 (Bits 12-9). Addr R1 (Bits 8-5).
+      10 => "10110011000100000",
+
+      -- 11: CLR R4 (Limpa R4 para teste)
+      11 => "00100100010000100",
+
+      -- 12: LW R4, 0(R1) -> Lê RAM[79]. R4 deve virar 10.
+      -- Op 0111. Dest R4. Addr R1.
+      12 => "01110100000100000",
+
+      -- ========================================================================
+      -- 3. VALIDAÇÃO "OR" (Lógica 2 Operandos)
+      -- R4 = 10 (01010). Testar se bit 3 (8) está setado.
+      -- Máscara = 7 (00111).
+      -- Se (10 | 7) == 15 (Diferente da Máscara), então bit 3 estava ON.
+      -- ========================================================================
+
+      -- 13: CLR R5 (Máscara)
+      13 => "00100101010100101",
+
+      -- 14: ADDI R5, 7 (R5 = 7 -> 00111)
+      14 => "10000101010100111",
+
+      -- 15: MOV R6, R4 (R6 = 10)
+      15 => "11100110010000000",
+
+      -- 16: OR R6, R5 (R6 = R6 | R5 -> 10 | 7 = 15)
+      -- Op 0100. Dest R6 (Bits 12-9). Src2 R5 (Bits 8-5).
+      -- O hardware usa Dest como Src1.
+      16 => "01000110010100000",
+
+      -- 17: CMPR R0, R6, R5 (Compara 15 com 7)
+      -- Resultado: Diferente (Z=0).
+      17 => "00110000011000101",
+
+      -- 18: BNE 2 (Se diferente, pula para SUCESSO)
+      -- Offset +2: Pula instruções 19 e 20. Vai para 21.
+      18 => "11000000000000010",
+
+      -- 19: (FALHA) Loop infinito
+      19 => "11110000000010011",
+
+      -- 20: ADD R7, R4 (Instrução morta, só pra ocupar espaço)
+      20 => "00010111010000100",
+
+      -- 21: (SUCESSO) Loop Infinito Final
+      21 => "11110000000010101",
+
       others => (others=>'0')
    );
 begin

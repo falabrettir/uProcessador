@@ -158,7 +158,7 @@ begin
   s_opcode      <= s_ir_out(16 downto 13);
   s_reg_dest    <= std_logic_vector(s_ir_out(12 downto 9));
 
-  s_reg_src1    <= std_logic_vector(s_ir_out(8 downto 5)) when s_opcode = "1000" or s_opcode = "1001" else
+  s_reg_src1    <= std_logic_vector(s_ir_out(8 downto 5)) when s_opcode = "1110" else
                    std_logic_vector(s_ir_out(12 downto 9)); --tipo R
 
   s_reg_src2    <= std_logic_vector(s_ir_out(8 downto 5));
@@ -172,8 +172,7 @@ begin
 
   -- LÓGICA DO MUX  
   -- O sinal seleciona a fonte:
-  -- "00" = Resultado da ULA (para ADD, SUB, MOV, etc.)
-  -- "01" = Constante (para LD)
+  -- "00" = Resultado da ULA (para ADD, SUB, MOV e ADDI etc.)
   -- "10" = Dado da RAM (para LW)
   s_mux_reg_wr <= s_ula_out          when s_sel_mux_reg_wr = "00" else
                   s_const_16bit      when s_sel_mux_reg_wr = "01" else

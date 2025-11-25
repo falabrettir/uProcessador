@@ -61,40 +61,34 @@ pc_in_out <= ("0000" & const_13bit_in) when (s_estado_atual = "10" and opcode_in
              pc_atual_in;
 
 flags_wr_en_out <= '1' when (s_estado_atual = "10" and (opcode_in = "0011" or 
-                     opcode_in = "0001" or opcode_in = "0010"))  
+                   opcode_in = "0001" or opcode_in = "0010")) else 
                    '0';
 
   --controle do banco
   reg_wr_en_out <= '1' when (s_estado_atual = "10") and
                    (opcode_in = "0001" or --add 
                     opcode_in = "0010" or --sub 
-                    opcode_in = "1000" or --addi
-                    opcode_in = "1001" or --subi
-                    opcode_in = "0111")   --lw 
+                    opcode_in = "1000" or --ld
+                    opcode_in = "0111" or --lw
+                    opcode_in = "1110" or --mov 
+                    opcode_in = "0100")   --or
                   else '0';
     
     --controle da ula 
-ula_chave_out <= "00" when (s_estado_atual = "10") and (opcode_in = "0001" or opcode_in = "1000") else --add e addi 
-                 "01" when (s_estado_atual = "10") and (opcode_in = "0010" or -- sub
-                  opcode_in = "1001" or -- subi 
-                  opcode_in = "0011") else 
-                  "00"; -- nop, jump etc
+ula_chave_out <= "00" when (s_estado_atual = "10") and (opcode_in = "0001" or opcode_in="1110") else --add e mov 
+                 "01" when (s_estado_atual = "10") and (opcode_in = "0010" or opcode_in = "0011") else 
+                 "11" when (s_estado_atual = "10") and (opcode_in = "0100") else
+                 "00"; -- nop, jump etc
                    
     --mux da ula
-    sel_mux_ula_b_out <= '1' when (s_estado_atual = "10") and 
-                         (opcode_in = "1000" or -- addi
-                         opcode_in = "1001") -- subi
+    sel_mux_ula_b_out <= '1' when (s_estado_atual = "10") and (opcode_in="1110" or opcode_in = "1000") 
                        else '0'; --por padrao pega do registrador
     -- controle da ram
     ram_wr_en_out <= '1' when (s_estado_atual = "10" and opcode_in = "1011") -- sw
                        else '0';
 
     --mux do banco 
-      sel_mux_reg_wr_out <= "01" when (s_estado_atual = "10" and -- Constante 
-                                   opcode_in = "1000" and 
-                                   reg_src1_in = "0000") else
-                        "10" when (s_estado_atual = "10" and -- Dado da RAM (lw)
-                                   opcode_in = "0111") else
-                        "00"; -- Padrão: saida da ula
+      sel_mux_reg_wr_out <= "10" when (s_estado_atual = "10" and opcode_in = "0111") else
+                            "00"; -- Padrão: saida da ula
 
 end architecture a_uc;
