@@ -30,7 +30,7 @@ begin
             
             -- Verificar se i está na lista de primos
             is_prime := false;
-            for j in 0 to 10 loop
+            for j in primes'range loop
                 if primes(j) = i then
                     is_prime := true;
                 end if;

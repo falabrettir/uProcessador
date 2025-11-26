@@ -59,7 +59,7 @@ begin
         variable addr_int : integer;
     begin
         addr_int := to_integer(unsigned(addr));
-        if addr_int >= 0 and addr_int <= 32 then
+        if addr_int >= rom'low and addr_int <= rom'high then
             data <= rom(addr_int);
         else
             data <= '0';  -- Endereço fora do intervalo retorna '0'
