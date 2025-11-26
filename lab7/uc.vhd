@@ -75,13 +75,13 @@ flags_wr_en_out <= '1' when (s_estado_atual = "10" and (opcode_in = "0011" or
                   else '0';
     
     --controle da ula 
-ula_chave_out <= "00" when (s_estado_atual = "10") and (opcode_in = "0001" or opcode_in="1110") else --add e mov 
+ula_chave_out <= "00" when (s_estado_atual = "10") and (opcode_in = "0001" or opcode_in= "1110") else --add e mov 
                  "01" when (s_estado_atual = "10") and (opcode_in = "0010" or opcode_in = "0011") else 
                  "11" when (s_estado_atual = "10") and (opcode_in = "0100") else
                  "00"; -- nop, jump etc
                    
     --mux da ula
-    sel_mux_ula_b_out <= '1' when (s_estado_atual = "10") and (opcode_in="1110" or opcode_in = "1000") 
+    sel_mux_ula_b_out <= '1' when (s_estado_atual = "10") and (opcode_in= "1110" or opcode_in = "1000") 
                        else '0'; --por padrao pega do registrador
     -- controle da ram
     ram_wr_en_out <= '1' when (s_estado_atual = "10" and opcode_in = "1011") -- sw

@@ -158,7 +158,7 @@ begin
   s_opcode      <= s_ir_out(16 downto 13);
   s_reg_dest    <= std_logic_vector(s_ir_out(12 downto 9));
 
-  s_reg_src1    <= std_logic_vector(s_ir_out(8 downto 5)) when s_opcode = "1110" else
+  s_reg_src1    <= std_logic_vector(s_ir_out(8 downto 5)) when (s_opcode = "1110" or s_opcode = "0111") else
                    std_logic_vector(s_ir_out(12 downto 9)); --tipo R
 
   s_reg_src2    <= std_logic_vector(s_ir_out(8 downto 5));
