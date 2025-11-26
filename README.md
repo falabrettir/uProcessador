@@ -31,7 +31,7 @@ As instruções possuem 17 bits e seguem três formatos principais.
 - **Tipo I:** `[Opcode 4] [Dest 4] [Src1 4] [Imm 5]`
 - **Tipo J:** `[Opcode 4] [Endereço 13]`
 
-### 3.2. Tabela de Instruções
+### 2.2. Tabela de Instruções
 
 | Mnemônico | Opcode | Tipo | Operação (RTL)      | Descrição                                |
 | :-------- | :----- | :--- | :------------------ | :--------------------------------------- |
