@@ -1,0 +1,119 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity rom is
+   port( clk      : in std_logic;
+         endereco : in unsigned(6 downto 0);
+         dado     : out unsigned(16 downto 0)
+   );
+end entity;
+
+architecture a_rom of rom is
+
+   type mem is array (0 to 127) of unsigned(16 downto 0);
+   constant conteudo_rom : mem := (
+      
+-- 0: CLR R1 (Zera R1)
+      -- Bin: 0010(SUB) 0001(R1) 0001(R1) 0001(R1) 0
+      0  => "00100001000100010", 
+
+      -- 1: ADDI R1, 15 (R1 = 0 + 15 = 15)
+      -- Bin: 1000(ADDI) 0001(Dest R1) 0001(Src R1) 01111(15)
+      1  => "10000001000101111",
+
+      -- 2: ADDI R1, 15 (R1 = 15 + 15 = 30)
+      2  => "10000001000101111",
+
+      -- 3: ADDI R1, 15 (R1 = 45)
+      3  => "10000001000101111",
+
+      -- 4: ADDI R1, 15 (R1 = 60)
+      4  => "10000001000101111",
+
+      -- 5: ADDI R1, 15 (R1 = 75)
+      5  => "10000001000101111",
+
+      -- 6: ADDI R1, 4 (R1 = 75 + 4 = 79) -> PONTEIRO OK!
+      6  => "10000001000100100",
+
+      -- ========================================================================
+      -- 2. TESTE DE RAM E MOV (Escrever e Ler)
+      -- Vamos escrever 10 na RAM[79]
+      -- ========================================================================
+
+      -- 7: CLR R2 (Limpa R2)
+      7  => "00100010001000100",
+
+      -- 8: ADDI R2, 10 (R2 = 10)
+      8  => "10000010001001010",
+
+      -- 9: MOV R3, R2 (Copia R2 para R3. R3 = 10)
+      -- Op 1110. Dest R3, Src R2.
+      9  => "11100011001000000",
+
+      -- 10: SW R3, 0(R1) -> Grava 10 no endereço 79
+      -- Op 1011. Data R3 (Bits 12-9). Addr R1 (Bits 8-5).
+      10 => "10110011000100000",
+
+      -- 11: CLR R4 (Limpa R4 para teste)
+      11 => "00100100010000100",
+
+      -- 12: LW R4, 0(R1) -> Lê RAM[79]. R4 deve virar 10.
+      -- Op 0111. Dest R4. Addr R1.
+      12 => "01110100000100000",
+
+      -- ========================================================================
+      -- 3. VALIDAÇÃO "OR" (Lógica 2 Operandos)
+      -- R4 = 10 (01010). Testar se bit 3 (8) está setado.
+      -- Máscara = 7 (00111).
+      -- Se (10 | 7) == 15 (Diferente da Máscara), então bit 3 estava ON.
+      -- ========================================================================
+
+      -- 13: CLR R5 (Máscara)
+      13 => "00100101010100101",
+
+      -- 14: ADDI R5, 7 (R5 = 7 -> 00111)
+      14 => "10000101010100111",
+
+      -- 15: MOV R6, R4 (R6 = 10)
+      15 => "11100110010000000",
+
+      -- 16: OR R6, R5 (R6 = R6 | R5 -> 10 | 7 = 15)
+      -- Op 0100. Dest R6 (Bits 12-9). Src2 R5 (Bits 8-5).
+      -- O hardware usa Dest como Src1.
+      16 => "01000110010100000",
+
+      -- 17: CMPR R0, R6, R5 (Compara 15 com 7)
+      -- Resultado: Diferente (Z=0).
+      17 => "00110000011000101",
+
+      -- 18: BNE 2 (Se diferente, pula para SUCESSO)
+      -- Offset +2: Pula instruções 19 e 20. Vai para 21.
+      18 => "11000000000000010",
+
+      -- 19: (FALHA) Loop infinito
+      19 => "11110000000010011",
+
+      -- 20: ADD R7, R4 (Instrução morta, só pra ocupar espaço)
+      20 => "00010111010000100",
+
+      -- 21: CLR R6 (Prepara R6 para próximo teste)
+      21 => "00100110011000000",
+
+      -- 22: ADD R6, R4 (R6 = R4 + R6 -> R6 = 0 + 10 = 10)
+      22 => "00010110010000000",
+
+      -- 23: (SUCESSO) Loop Infinito Final
+      23 => "11110000000010111",
+
+      others => (others=>'0')
+   );
+begin
+   process(clk)
+   begin
+      if(rising_edge(clk)) then
+         dado <= conteudo_rom(to_integer(endereco));
+      end if;
+   end process;
+end architecture a_rom;
