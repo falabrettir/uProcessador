@@ -14,9 +14,6 @@ architecture a_rom of rom is
    type mem is array (0 to 127) of unsigned(16 downto 0);
    constant conteudo_rom : mem := (
       
--- ===============================================================
-      -- 1. INICIALIZAÇÃO (R1=79, R4=33, R7=0)
-      -- ===============================================================
       0  => "00100001000100010", -- CLR R1
       1  => "10000001000101111", -- ADDI R1, 15
       2  => "10000001000101111", -- ADDI R1, 15
@@ -42,7 +39,6 @@ architecture a_rom of rom is
       14 => "11100011000100000", -- MOV R3, R1 (Base)
       15 => "00010011001000000", -- ADD R3, R2 (Base + i)
       
-      -- SW CORRIGIDO: Dado R2(12-9), Addr R3(8-5)
       -- Bin: 1011 0010 0011 00000
       16 => "10110010001100000", -- SW R2, (R3)
       
@@ -74,18 +70,15 @@ architecture a_rom of rom is
       -- 1. Incrementa
       31 => "00010110010100000", -- ADD R6, R5
       
-      -- 2. Verificação com OR (R2 contém 31)
       32 => "11101000011000000", -- MOV R8, R6 (Copia R6 para R8)
       33 => "01001000001000000", -- OR  R8, R2 (R8 = R8 OR 31)
       34 => "00111000001000000", -- CMPR R8, R2 (Compara Result com 31)
       
       -- 3. Decisão
       -- Se Z=0 (Not Equal), resultado foi 63 -> SAI. 
-      -- BNE Offset (opcode 1100). Pule as instruções de escrita e o JMP de volta.
-      -- Supondo que a escrita são 3 instr + 1 JMP volta = 4 linhas. Offset = +4
+      -- BNE Offset.
       35 => "11000000000000100", -- BNE +4 (Sai do loop)
 
-      -- 4. Escrita (Mantém lógica original de endereço base 79 em R1)
       36 => "11100011000100000", -- MOV R3, R1
       37 => "00010011011000000", -- ADD R3, R6
       38 => "10110111001100000", -- SW R7, (R3)
@@ -105,15 +98,12 @@ architecture a_rom of rom is
       44 => "11100110010100000", -- MOV R6, R5
 
       -- LOOP 3 (End 40)
-      -- 2. Verificação com OR (R2 contém 31)
       45 => "11101000011000000", -- MOV R8, R6 (Copia R6 para R8)
       46 => "01001000001000000", -- OR  R8, R2 (R8 = R8 OR 31)
       47 => "00111000001000000", -- CMPR R8, R2 (Compara Result com 31)
       
-      -- 3. Decisão
       -- Se Z=0 (Not Equal), resultado foi 63 -> SAI. 
-      -- BNE Offset (opcode 1100). Pule as instruções de escrita e o JMP de volta.
-      -- Supondo que a escrita são 3 instr + 1 JMP volta = 4 linhas. Offset = +4
+      -- BNE Offset
       48 => "11000000000000100", -- BNE +4 (Sai do loop)
 
       49 => "11100011000100000",
@@ -135,14 +125,12 @@ architecture a_rom of rom is
 
       -- LOOP 5 (End 53)
       -- 2. Verificação com OR (R2 contém 31)
-      58 => "11101000011000000", -- MOV R8, R6 (Copia R6 para R8)
-      59 => "01001000001000000", -- OR  R8, R2 (R8 = R8 OR 31)
-      60 => "00111000001000000", -- CMPR R8, R2 (Compara Result com 31)
+      58 => "11101000011000000", -- MOV R8, R6 
+      59 => "01001000001000000", -- OR  R8, R2
+      60 => "00111000001000000", -- CMPR R8, R2
       
-      -- 3. Decisão
       -- Se Z=0 (Not Equal), resultado foi 63 -> SAI. 
-      -- BNE Offset (opcode 1100). Pule as instruções de escrita e o JMP de volta.
-      -- Supondo que a escrita são 3 instr + 1 JMP volta = 4 linhas. Offset = +4
+      -- BNE Offset
       61 => "11000000000000100", -- BNE +4 (Sai do loop)
 
       62 => "11100011000100000",
@@ -151,9 +139,6 @@ architecture a_rom of rom is
       64 => "10110111001100000",
       65 => "11110000000110101", -- JMP 53
 
-      -- ===============================================================
-      -- 6. LEITURA FINAL
-      -- ===============================================================
       66 => "00100101010100000", -- CLR R5 (Comparador de inteiros)
       67 => "00101000100000000", -- CLR R8 (Pino de saída) 
       
