@@ -98,8 +98,14 @@ architecture a_rom of rom is
       -- 20: ADD R7, R4 (Instrução morta, só pra ocupar espaço)
       20 => "00010111010000100",
 
-      -- 21: (SUCESSO) Loop Infinito Final
-      21 => "11110000000010101",
+      -- 21: CLR R6 (Prepara R6 para próximo teste)
+      21 => "00100110011000000",
+
+      -- 22: ADD R6, R4 (R6 = R4 + R6 -> R6 = 0 + 10 = 10)
+      22 => "00010110010000000",
+
+      -- 23: (SUCESSO) Loop Infinito Final
+      23 => "11110000000010111",
 
       others => (others=>'0')
    );
