@@ -1,0 +1,23 @@
+{'Acumulador ou não': 'ULA com instruções ortogonais',
+ 'Número de registradores no banco': [9],
+ 'Carga de constantes': 'Soma a constante com um Rn zerado por CLR Rn',
+ 'ADD ops': 'ADD com dois operandos apenas',
+ 'SUB ops': 'Subtração com dois operandos apenas',
+ 'ADD ctes': 'ADD apenas entre registradores, nunca com constantes',
+ 'SUB ctes': 'Subtração apenas entre registradores, nunca com constantes'}
+
+Dados de sincronização de operações:
+{'Registrador de Instruções': ['wr_en no segundo estado'],
+ 'Incremento do PC': ['PC+1 gravado no último estado']}
+
+Dados relativos ao lab #6:
+{'Comparações': 'Comparação apenas com CMPR',
+ 'Saltos condicionais': ['BNE', 'BLO']}
+
+{'Largura da ROM / tamanho da instrução em bits': [17],
+ 'Leitura da ROM': ['síncrona']}
+
+
+['Tabela do crivo começa no endereço 79 da RAM',
+ 'JNB direto no bit b5 ou bn',
+ 'Detecção do MSB setado usando OR']
