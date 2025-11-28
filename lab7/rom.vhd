@@ -27,7 +27,7 @@ architecture a_rom of rom is
       9  => "10000010001001111", -- ADDI R2, 15
       10 => "10000010001000011", -- ADDI R2, 3
       11 => "11100100001000000", -- MOV R4, R2 (R4=33)
-
+      
       12 => "00100111011101110", -- CLR R7 (Zero)
 
       -- 2. PREENCHIMENTO RAM (0..32)
@@ -57,7 +57,7 @@ architecture a_rom of rom is
       25 => "10000010001001111", -- ADDI R2, 15
       26 => "10000010001001111", -- ADDI R2, 15
       27 => "10000010001000001", -- ADDI R2, 1
-
+      -- máscara de bits
       -- 3. CRIVO DO 2
       28 => "00100101010100101", -- CLR R5
       29 => "10000101010100010", -- ADDI R5, 2
@@ -113,7 +113,7 @@ architecture a_rom of rom is
       52 => "00000000000000000", -- NOP 
 
 
-      -- 5. CRIVO DO 5 (CORRIGIDO)
+      -- 5. CRIVO DO 5
       -- Inicialização (R5=5, R6=5)
       53 => "00100101010100101", -- CLR R5
       54 => "10000101010100101", -- ADDI R5, 5
